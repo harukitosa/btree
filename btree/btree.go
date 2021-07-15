@@ -1,6 +1,6 @@
 package btree
 
-import "log"
+import "fmt"
 
 const (
 	t = 2
@@ -59,7 +59,7 @@ func BTreeSplitChild(x *Node, i int) {
 	for j := x.N; j >= i; j-- {
 		x.Key[index(j+1)] = x.Key[index(j)]
 	}
-	x.Key[index(i)] = x.Key[index(t)]
+	x.Key[index(i)] = y.Key[index(t)]
 	x.N = x.N + 1
 	DiskWrite(x)
 	DiskWrite(y)
@@ -96,7 +96,7 @@ func BTreeInsertNonFull(x *Node, k string) {
 			i--
 		}
 		i++
-		log.Println(DiskRead(x.C[index(i)]))
+		DiskRead(x.C[index(i)])
 		if x.C[index(i)].N == 2*t-1 {
 			BTreeSplitChild(x, i)
 			if k > x.Key[index(i)] {
@@ -119,6 +119,18 @@ func BTreeSearch(x *Node, k string) (*Node, int) {
 	} else {
 		DiskRead(x.C[index(i)])
 		return BTreeSearch(x.C[index(i)], k)
+	}
+}
+
+func PrintBTree(root *Node) {
+	for i := 0; i < root.N; i++ {
+		fmt.Printf("%v ", root.Key[i])
+	}
+	fmt.Println()
+	for i := 0; i < len(root.C); i++ {
+		if root.C[i] != nil {
+			PrintBTree(root.C[i])
+		}
 	}
 }
 
